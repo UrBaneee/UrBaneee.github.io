@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Skye Yin</title>
-  <meta name="description" content="Personal site of Skye Yin — projects, vibe coding videos, and notes.">
+  <meta name="description" content="Skye Yin builds eval-first AI systems and small everyday tools. Projects, demo videos and notes.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preconnect" href="https://i.scdn.co">
@@ -20,11 +20,13 @@
       <div class="intro-text">
         <p class="intro-kicker">Hello, I'm</p>
         <h1 class="intro-name">Skye Yin</h1>
-        <!-- TODO: replace with your real bio -->
         <p class="intro-bio">
-          I build things with code and curiosity. Lately I've been exploring
-          <em>vibe coding</em> — turning ideas into working software by
-          describing exactly what I want, and letting the computer do the rest.
+          I build AI systems and measure whether they actually work. Most of my
+          projects are <em>eval-first</em>: a multi-agent data analyst, a RAG
+          framework and a knowledge system, each with its own evaluation before
+          I trust the result. I also make small tools I use every day, from a
+          vocabulary extension for Chrome to Claude Code skills for job hunting.
+          Away from code, you'll find me at a piano or behind a film camera.
         </p>
         <nav class="social-row" aria-label="Social links">
           <a class="social-link" href="https://www.linkedin.com/in/skye-yin/" target="_blank" rel="noopener" aria-label="LinkedIn">
@@ -63,36 +65,6 @@
 
   <!-- ============ BENTO GRID ============ -->
   <main class="bento">
-
-    <!-- Film strip: vibe coding videos (spans full width) -->
-    <section class="card card-film reveal" aria-labelledby="film-title">
-      <div class="card-label">
-        <span class="label-tape">REEL 01</span>
-        <h2 id="film-title">Vibe Coding Screenings</h2>
-      </div>
-      <div class="film-strip">
-        <div class="film-holes" aria-hidden="true"></div>
-        <div class="film-frames">
-          <figure class="film-frame">
-            <div class="frame-media">
-              <iframe src="https://www.youtube-nocookie.com/embed/janSgbKTwv8" title="LexiLearn demo video"
-                loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowfullscreen></iframe>
-            </div>
-            <figcaption>TAKE 01 · LexiLearn</figcaption>
-          </figure>
-          <figure class="film-frame">
-            <div class="frame-media">
-              <iframe src="https://www.youtube-nocookie.com/embed/Q6UUWAXrX4A" title="QueryQuant demo video"
-                loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowfullscreen></iframe>
-            </div>
-            <figcaption>TAKE 02 · QueryQuant</figcaption>
-          </figure>
-        </div>
-        <div class="film-holes" aria-hidden="true"></div>
-      </div>
-    </section>
 
     <!-- Vinyl record -->
     <section class="card card-vinyl reveal" aria-labelledby="vinyl-title">
@@ -166,20 +138,36 @@
           <ul class="piece-tags"><li>Python</li><li>MCP</li></ul>
           <span class="piece-cta">View on GitHub →</span>
         </a>
-        <a class="puzzle-piece" href="https://github.com/UrBaneee/lexilearn-extension-v0.3.3" target="_blank" rel="noopener">
+        <article class="puzzle-piece has-video">
           <span class="piece-index">05 · Apps</span>
           <h3>LexiLearn</h3>
           <p>A Chrome extension for reading in English. Look up a word in its sentence with on-device AI, then save the meaning and source to a vocabulary deck you can review and export.</p>
+          <button type="button" class="piece-video" data-video="janSgbKTwv8" data-caption="TAKE 01 · LexiLearn" aria-label="Watch the LexiLearn demo video">
+            <span class="film-holes film-holes-sm" aria-hidden="true"></span>
+            <span class="piece-video-frame">
+              <img src="https://i.ytimg.com/vi/janSgbKTwv8/maxresdefault.jpg" alt="" width="1280" height="720" loading="lazy">
+              <span class="piece-video-play" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M8 5.5v13l11-6.5z"/></svg></span>
+            </span>
+            <span class="piece-video-caption" aria-hidden="true">TAKE 01 · Watch the demo</span>
+          </button>
           <ul class="piece-tags"><li>JavaScript</li><li>Chrome extension</li></ul>
-          <span class="piece-cta">View on GitHub →</span>
-        </a>
-        <a class="puzzle-piece" href="https://github.com/UrBaneee/queryquant" target="_blank" rel="noopener">
+          <a class="piece-cta" href="https://github.com/UrBaneee/lexilearn-extension-v0.3.3" target="_blank" rel="noopener">View on GitHub →</a>
+        </article>
+        <article class="puzzle-piece has-video">
           <span class="piece-index">06 · Apps</span>
           <h3>QueryQuant</h3>
           <p>A GitHub-style contribution graph for AI-assisted thinking. It counts how many questions you ask AI each day and keeps everything in your browser.</p>
+          <button type="button" class="piece-video" data-video="Q6UUWAXrX4A" data-caption="TAKE 02 · QueryQuant" aria-label="Watch the QueryQuant demo video">
+            <span class="film-holes film-holes-sm" aria-hidden="true"></span>
+            <span class="piece-video-frame">
+              <img src="https://i.ytimg.com/vi/Q6UUWAXrX4A/maxresdefault.jpg" alt="" width="1280" height="720" loading="lazy">
+              <span class="piece-video-play" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M8 5.5v13l11-6.5z"/></svg></span>
+            </span>
+            <span class="piece-video-caption" aria-hidden="true">TAKE 02 · Watch the demo</span>
+          </button>
           <ul class="piece-tags"><li>TypeScript</li><li>Frontend-only</li></ul>
-          <span class="piece-cta">View on GitHub →</span>
-        </a>
+          <a class="piece-cta" href="https://github.com/UrBaneee/queryquant" target="_blank" rel="noopener">View on GitHub →</a>
+        </article>
         <a class="puzzle-piece" href="https://github.com/UrBaneee/warehouse-interview-assistant" target="_blank" rel="noopener">
           <span class="piece-index">07 · Apps</span>
           <h3>Warehouse Interview Assistant</h3>
@@ -247,6 +235,19 @@
     </section>
 
   </main>
+
+  <!-- Screening room: demo videos open here -->
+  <dialog class="screening" id="screening" aria-labelledby="screening-caption">
+    <div class="film-strip">
+      <div class="film-holes" aria-hidden="true"></div>
+      <div class="frame-media" id="screening-media"></div>
+      <div class="screening-bar">
+        <p id="screening-caption"></p>
+        <button type="button" class="screening-close" id="screening-close" autofocus>Close</button>
+      </div>
+      <div class="film-holes" aria-hidden="true"></div>
+    </div>
+  </dialog>
 
   <footer class="footer">
     <p>© 2026 Skye Yin · Cut on film, pressed on vinyl, assembled piece by piece.</p>

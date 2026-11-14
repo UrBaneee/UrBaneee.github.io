@@ -165,7 +165,7 @@ a:focus-visible, button:focus-visible {
   box-shadow: var(--shadow);
 }
 
-.card-film, .card-projects { grid-column: 1 / -1; }
+.card-projects { grid-column: 1 / -1; }
 
 .card-label {
   display: flex;
@@ -204,14 +204,11 @@ a:focus-visible, button:focus-visible {
   background-repeat: repeat-x;
 }
 
-.film-frames {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 18px;
-  padding: 4px 2px;
+.film-holes-sm {
+  height: 13px;
+  background-image: radial-gradient(circle at 50% 50%, var(--paper) 0, var(--paper) 2.4px, transparent 2.9px);
+  background-size: 18px 13px;
 }
-
-.film-frame { margin: 0; }
 
 .frame-media {
   aspect-ratio: 16 / 9;
@@ -222,13 +219,98 @@ a:focus-visible, button:focus-visible {
 }
 .frame-media iframe { width: 100%; height: 100%; border: 0; display: block; }
 
-.film-frame figcaption {
+/* demo video thumbnail inside a project card */
+.piece-video {
+  display: block;
+  width: 100%;
+  margin: 0 0 14px;
+  padding: 2px 8px 0;
+  border: 0;
+  border-radius: 8px;
+  background: var(--black);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.piece-video > span { display: block; }
+.piece-video-frame {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  border-radius: 3px;
+  overflow: hidden;
+  background: #000;
+}
+.piece-video-frame img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  opacity: 0.88;
+  transition: opacity 0.2s ease;
+}
+.piece-video:hover .piece-video-frame img { opacity: 1; }
+.piece-video-play {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  background: var(--accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.45);
+  transition: background 0.2s ease;
+}
+.piece-video:hover .piece-video-play { background: var(--accent-ink); }
+.piece-video-play svg { width: 22px; height: 22px; fill: #fff8f0; }
+.piece-video-caption {
+  font-size: 10.5px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #b0a58d;
+  padding: 6px 2px 7px;
+}
+
+/* screening room dialog */
+.screening {
+  width: min(940px, 94vw);
+  margin: auto;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  overflow: visible;
+}
+.screening::backdrop { background: rgba(20, 18, 16, 0.78); }
+.screening .film-strip { box-shadow: 0 30px 80px -20px rgba(0, 0, 0, 0.7); }
+.screening-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 4px 2px 0;
+}
+.screening-bar p {
   font-size: 11px;
   letter-spacing: 0.16em;
-  color: #b0a58d;
-  padding: 7px 2px 5px;
   text-transform: uppercase;
+  color: #b0a58d;
 }
+.screening-close {
+  min-height: 40px;
+  padding: 6px 14px;
+  border: 1px solid #4a4436;
+  border-radius: 999px;
+  background: transparent;
+  color: #f4eee3;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+.screening-close:hover { background: #2c2822; border-color: #6f6659; }
 
 /* ---- Vinyl ---- */
 .card-vinyl { display: flex; flex-direction: column; }
@@ -472,7 +554,12 @@ a:focus-visible, button:focus-visible {
   background: var(--card);
   color: var(--muted);
 }
-.piece-cta { font-size: 13.5px; font-weight: 600; color: var(--accent-ink); }
+.piece-cta { font-size: 13.5px; font-weight: 600; color: var(--accent-ink); text-decoration: none; }
+a.piece-cta { align-self: flex-start; padding: 4px 0; }
+a.piece-cta:hover { text-decoration: underline; }
+.puzzle-piece.has-video { cursor: default; }
+.puzzle-piece.has-video .piece-tags { margin-top: 0; }
+.puzzle-piece.has-video .piece-video { margin-top: auto; }
 
 .piece-empty { opacity: 0.75; }
 .piece-empty h3 { color: var(--muted); }
@@ -544,7 +631,6 @@ a:focus-visible, button:focus-visible {
   .intro-inner { flex-direction: column-reverse; align-items: flex-start; }
   .portrait-frame { transform: rotate(2.5deg); width: 150px; }
   .bento { grid-template-columns: 1fr; }
-  .film-frames { grid-template-columns: 1fr; }
 }
 
 @media (max-width: 520px) {

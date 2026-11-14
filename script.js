@@ -118,3 +118,43 @@ if (crate && record) {
     embedEl.replaceWith(frame);
   }, 6000);
 }
+
+// Screening room: project demo videos open in a film-strip dialog
+const screening = document.getElementById("screening");
+
+if (screening && typeof screening.showModal === "function") {
+  const media = document.getElementById("screening-media");
+  const caption = document.getElementById("screening-caption");
+
+  document.querySelectorAll(".piece-video").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const frame = document.createElement("iframe");
+      frame.src = `https://www.youtube-nocookie.com/embed/${btn.dataset.video}?autoplay=1&rel=0`;
+      frame.title = btn.dataset.caption;
+      frame.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture";
+      frame.allowFullscreen = true;
+      media.replaceChildren(frame);
+      caption.textContent = btn.dataset.caption;
+      screening.showModal();
+    });
+  });
+
+  // stop playback right away, whichever way the dialog is closed
+  const stop = () => media.replaceChildren();
+  const closeScreening = () => {
+    stop();
+    screening.close();
+  };
+  document.getElementById("screening-close").addEventListener("click", closeScreening);
+  // clicking the dark backdrop closes it too
+  screening.addEventListener("click", (e) => {
+    if (e.target === screening) closeScreening();
+  });
+  screening.addEventListener("cancel", stop); // Esc
+  screening.addEventListener("close", stop);
+} else {
+  // very old browsers: fall back to opening the video on YouTube
+  document.querySelectorAll(".piece-video").forEach((btn) => {
+    btn.addEventListener("click", () => window.open(`https://youtu.be/${btn.dataset.video}`, "_blank", "noopener"));
+  });
+}
