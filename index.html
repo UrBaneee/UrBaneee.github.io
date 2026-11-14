@@ -7,6 +7,7 @@
   <meta name="description" content="Personal site of Skye Yin — projects, vibe coding videos, and notes.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://i.scdn.co">
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Space+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='46' fill='%23141210'/><circle cx='50' cy='50' r='16' fill='%23c8451f'/><circle cx='50' cy='50' r='4' fill='%23f4eee3'/></svg>">
@@ -99,20 +100,20 @@
         <span class="label-tape">SIDE A</span>
         <h2 id="vinyl-title">Now Spinning</h2>
       </div>
-      <div class="vinyl-wrap">
-        <div class="vinyl" id="vinyl" aria-hidden="true">
-          <div class="vinyl-sheen"></div>
-          <div class="vinyl-label">
-            <span id="vinyl-label-text">SAKAMOTO</span>
+      <div class="record" id="record">
+        <div class="record-slot" aria-hidden="true">
+          <div class="vinyl">
+            <div class="vinyl-sheen"></div>
+            <div class="vinyl-label" id="vinyl-label"></div>
+            <div class="vinyl-hole"></div>
           </div>
-          <div class="vinyl-hole"></div>
         </div>
-        <div class="tonearm" aria-hidden="true"></div>
+        <div class="record-sleeve">
+          <img id="record-cover" src="https://i.scdn.co/image/ab67616d0000b2737f93d0fcc5852192890f7918" alt="Album cover: Music For Film by Ryuichi Sakamoto" width="640" height="640">
+        </div>
       </div>
-      <div class="vinyl-info" aria-live="polite">
-        <p class="vinyl-album" id="vinyl-album">Music For Film</p>
-        <p class="vinyl-artist" id="vinyl-artist">Ryuichi Sakamoto · 2016</p>
-        <a class="vinyl-listen" id="vinyl-listen" href="https://open.spotify.com/album/202ZOGO9zNndH8oxrBrm35" target="_blank" rel="noopener">Listen on Spotify →</a>
+      <div class="spotify-frame">
+        <div id="spotify-embed"></div>
       </div>
       <div class="crate" id="crate" role="group" aria-label="Pick a record from the crate"></div>
     </section>
@@ -252,6 +253,7 @@
   </footer>
 
   <script src="script.js"></script>
+  <script async src="https://open.spotify.com/embed/iframe-api/v1"></script>
   <!-- Needed only when a real tweet embed is pasted into .x-embed -->
   <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
 </body>

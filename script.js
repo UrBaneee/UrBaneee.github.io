@@ -19,70 +19,48 @@ if (prefersReducedMotion || !("IntersectionObserver" in window)) {
   cards.forEach((el) => observer.observe(el));
 }
 
-// Record crate: pick which album is on the turntable
+// Record crate: pick which album is on the turntable.
+// Covers are loaded from Spotify's image CDN; playback is Spotify's own embed.
 const albums = [
-  {
-    title: "Music For Film",
-    artist: "Ryuichi Sakamoto",
-    year: 2016,
-    label: "SAKAMOTO",
-    bg: "#d8d2c4",
-    fg: "#1c1a17",
-    url: "https://open.spotify.com/album/202ZOGO9zNndH8oxrBrm35",
-  },
-  {
-    title: "Delta Dawn",
-    artist: "Tanya Tucker",
-    year: 1972,
-    label: "DELTA DAWN",
-    bg: "#6f7a3a",
-    fg: "#f6f1e3",
-    url: "https://open.spotify.com/album/3iyNh3uhudXLW5tNLapDZS",
-  },
-  {
-    title: "A Symphonic Celebration",
-    artist: "Joe Hisaishi · Royal Philharmonic Orchestra",
-    year: 2023,
-    label: "HISAISHI",
-    bg: "#f2d21f",
-    fg: "#1c1a17",
-    url: "https://open.spotify.com/album/561qUZZO6f2sILHUMlXmlM",
-  },
-  {
-    title: "我去2000年",
-    artist: "Pu Shu 朴树",
-    year: 1999,
-    label: "朴树",
-    bg: "#c9973a",
-    fg: "#1c1a17",
-    url: "https://open.spotify.com/album/5MXApzS7FdKbHoVRK6IDtw",
-  },
+  { title: "Music For Film", artist: "Ryuichi Sakamoto", id: "202ZOGO9zNndH8oxrBrm35", cover: "7f93d0fcc5852192890f7918" },
+  { title: "Delta Dawn", artist: "Tanya Tucker", id: "3iyNh3uhudXLW5tNLapDZS", cover: "ba6c1e3f4d2454cec0c54361" },
+  { title: "A Symphonic Celebration", artist: "Joe Hisaishi", id: "561qUZZO6f2sILHUMlXmlM", cover: "8d4306c0878768bf296a39ed" },
+  { title: "我去2000年", artist: "Pu Shu 朴树", id: "5MXApzS7FdKbHoVRK6IDtw", cover: "2a2eb00100a85c104d0c5ae7" },
 ];
+const coverUrl = (a, size) =>
+  `https://i.scdn.co/image/ab67616d0000${size === "large" ? "b273" : "1e02"}${a.cover}`;
 
 const crate = document.getElementById("crate");
-const vinyl = document.getElementById("vinyl");
+const record = document.getElementById("record");
 
-if (crate && vinyl) {
-  const labelText = document.getElementById("vinyl-label-text");
-  const albumEl = document.getElementById("vinyl-album");
-  const artistEl = document.getElementById("vinyl-artist");
-  const listenEl = document.getElementById("vinyl-listen");
-  const wrap = vinyl.parentElement;
+if (crate && record) {
+  const coverEl = document.getElementById("record-cover");
+  const labelEl = document.getElementById("vinyl-label");
+  const embedEl = document.getElementById("spotify-embed");
   let current = 0;
+  let controller = null;
   let swapTimer;
+
+  const setPlaying = (on) => record.classList.toggle("is-playing", on);
 
   const show = (i) => {
     const a = albums[i];
-    vinyl.style.setProperty("--label-bg", a.bg);
-    vinyl.style.setProperty("--label-fg", a.fg);
-    labelText.textContent = a.label;
-    albumEl.textContent = a.title;
-    artistEl.textContent = `${a.artist} · ${a.year}`;
-    listenEl.href = a.url;
+    coverEl.src = coverUrl(a, "large");
+    coverEl.alt = `Album cover: ${a.title} by ${a.artist}`;
+    labelEl.style.backgroundImage = `url("${coverUrl(a, "small")}")`;
     crate.querySelectorAll("button").forEach((b, j) => {
       b.classList.toggle("is-active", j === i);
       b.setAttribute("aria-pressed", String(j === i));
     });
+    if (i !== current) {
+      setPlaying(false);
+      if (controller) {
+        controller.loadUri(`spotify:album:${a.id}`);
+      } else {
+        const frame = embedEl.parentElement.querySelector("iframe");
+        if (frame) frame.src = `https://open.spotify.com/embed/album/${a.id}`;
+      }
+    }
     current = i;
   };
 
@@ -90,7 +68,7 @@ if (crate && vinyl) {
     const b = document.createElement("button");
     b.type = "button";
     b.className = "crate-disc";
-    b.style.setProperty("--label-bg", a.bg);
+    b.style.backgroundImage = `url("${coverUrl(a, "small")}")`;
     b.setAttribute("aria-label", `${a.title} by ${a.artist}`);
     b.title = `${a.title} · ${a.artist}`;
     b.addEventListener("click", () => {
@@ -100,14 +78,43 @@ if (crate && vinyl) {
         show(i);
         return;
       }
-      wrap.classList.add("is-swapping");
+      // slide the record back into the sleeve, change sleeves, slide it out again
+      record.classList.add("is-swapping");
       swapTimer = setTimeout(() => {
         show(i);
-        wrap.classList.remove("is-swapping");
-      }, 260);
+        record.classList.remove("is-swapping");
+      }, 420);
     });
     crate.appendChild(b);
   });
 
   show(0);
+
+  // Spotify's embed API tells us when music is actually playing,
+  // so the record only spins while a track plays.
+  window.onSpotifyIframeApiReady = (IFrameAPI) => {
+    IFrameAPI.createController(
+      embedEl,
+      { uri: `spotify:album:${albums[current].id}`, width: "100%", height: 152 },
+      (c) => {
+        controller = c;
+        c.addListener("playback_update", (e) => {
+          const d = (e && e.data) || {};
+          setPlaying(d.isPaused === false);
+        });
+      }
+    );
+  };
+
+  // If the API script is blocked or slow, fall back to a plain embed.
+  setTimeout(() => {
+    if (controller || embedEl.parentElement.querySelector("iframe")) return;
+    const frame = document.createElement("iframe");
+    frame.src = `https://open.spotify.com/embed/album/${albums[current].id}`;
+    frame.title = "Spotify player";
+    frame.height = "152";
+    frame.loading = "lazy";
+    frame.allow = "autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture";
+    embedEl.replaceWith(frame);
+  }, 6000);
 }

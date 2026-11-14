@@ -233,135 +233,127 @@ a:focus-visible, button:focus-visible {
 /* ---- Vinyl ---- */
 .card-vinyl { display: flex; flex-direction: column; }
 
-.vinyl-wrap {
+/* a record sleeve with the disc sliding out of its right edge */
+.record {
+  --size: clamp(150px, 46vw, 190px);
   position: relative;
-  display: flex;
-  justify-content: center;
-  padding: 12px 0 18px;
+  width: var(--size);
+  height: var(--size);
+  margin: 6px auto 22px;
+  transform: translateX(-19%);
 }
 
+.record-sleeve {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  border-radius: 3px;
+  overflow: hidden;
+  background: #2a2620;
+  box-shadow:
+    0 12px 26px -12px rgba(20, 18, 16, 0.6),
+    0 2px 5px rgba(20, 18, 16, 0.25);
+}
+.record-sleeve img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+/* paper edge + soft sheen so it reads as a printed sleeve */
+.record-sleeve::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(105deg, rgba(255, 255, 255, 0.14) 0%, transparent 32%, transparent 70%, rgba(0, 0, 0, 0.16) 100%);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08), inset -3px 0 4px -2px rgba(0, 0, 0, 0.45);
+}
+
+.record-slot {
+  position: absolute;
+  top: 3%;
+  left: 3%;
+  width: 94%;
+  height: 94%;
+  z-index: 1;
+  transform: translateX(38%);
+  transition: transform 0.42s cubic-bezier(0.3, 0.7, 0.3, 1);
+}
+.record.is-playing .record-slot { transform: translateX(54%); }
+.record.is-swapping .record-slot { transform: translateX(2%); }
+.record-sleeve img { transition: opacity 0.2s ease; }
+.record.is-swapping .record-sleeve img { opacity: 0.35; }
+
 .vinyl {
-  width: min(210px, 62%);
-  aspect-ratio: 1;
+  width: 100%;
+  height: 100%;
   border-radius: 50%;
   position: relative;
   background:
     repeating-radial-gradient(circle at 50% 50%,
       #16130f 0px, #16130f 2px, #221e17 3px, #16130f 4px);
-  box-shadow: 0 8px 24px -8px rgba(20, 18, 16, 0.55);
-  animation: spin 6s linear infinite;
+  box-shadow: 0 6px 18px -8px rgba(20, 18, 16, 0.6);
+  animation: spin 3.4s linear infinite;
+  animation-play-state: paused;
 }
+.record.is-playing .vinyl { animation-play-state: running; }
+
 .vinyl-sheen {
   position: absolute; inset: 0;
   border-radius: 50%;
   background: conic-gradient(from 40deg,
-    transparent 0deg, rgba(255, 250, 235, 0.10) 25deg, transparent 60deg,
-    transparent 180deg, rgba(255, 250, 235, 0.07) 205deg, transparent 240deg);
+    transparent 0deg, rgba(255, 250, 235, 0.12) 25deg, transparent 60deg,
+    transparent 180deg, rgba(255, 250, 235, 0.08) 205deg, transparent 240deg);
 }
 .vinyl-label {
   position: absolute; inset: 0;
   margin: auto;
-  width: 37%; height: 37%;
+  width: 38%; height: 38%;
   border-radius: 50%;
-  background: var(--label-bg, var(--accent));
-  box-shadow: inset 0 0 0 3px rgba(20, 18, 16, 0.12);
-  display: flex;
-  align-items: flex-start;
-  justify-content: center;
-  transition: background 0.25s ease;
-}
-.vinyl-label span {
-  margin-top: 17%;
-  font-size: 8px;
-  font-weight: 600;
-  letter-spacing: 0.12em;
-  white-space: nowrap;
-  color: var(--label-fg, #fff3e4);
+  background: #3a342a center / cover no-repeat;
+  box-shadow: 0 0 0 2px rgba(20, 18, 16, 0.5);
 }
 .vinyl-hole {
   position: absolute; inset: 0;
   margin: auto;
-  width: 7%; height: 7%;
+  width: 5%; height: 5%;
   border-radius: 50%;
   background: var(--card);
-  box-shadow: inset 0 1px 2px rgba(0,0,0,0.4);
-}
-
-.tonearm {
-  position: absolute;
-  top: 4px;
-  right: 8%;
-  width: 5px;
-  height: 46%;
-  background: linear-gradient(#8b8172, #5b5344);
-  border-radius: 3px;
-  transform-origin: top center;
-  transform: rotate(-22deg);
-}
-.tonearm::before {
-  content: "";
-  position: absolute;
-  top: -7px; left: -5px;
-  width: 15px; height: 15px;
-  border-radius: 50%;
-  background: #4a4436;
-}
-.tonearm::after {
-  content: "";
-  position: absolute;
-  bottom: -3px; left: -3px;
-  width: 11px; height: 16px;
-  border-radius: 3px;
-  background: var(--accent-ink);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.5);
 }
 
 @keyframes spin { to { transform: rotate(360deg); } }
 
-.vinyl-wrap .vinyl,
-.vinyl-wrap .tonearm { transition: opacity 0.25s ease, transform 0.25s ease; }
-.vinyl-wrap.is-swapping .vinyl { opacity: 0; }
-.vinyl-wrap.is-swapping .tonearm { transform: rotate(-40deg); }
-
-.vinyl-info { text-align: center; }
-.vinyl-album {
-  font-family: "Fraunces", Georgia, serif;
-  font-size: 19px;
-  font-weight: 600;
-  line-height: 1.25;
+.spotify-frame {
+  min-height: 152px;
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--paper-deep);
 }
-.vinyl-artist { font-size: 14px; color: var(--muted); margin-top: 2px; }
-.vinyl-listen {
-  display: inline-block;
-  margin-top: 8px;
-  padding: 6px 4px;
-  font-size: 13.5px;
-  font-weight: 600;
-  color: var(--accent-ink);
-  text-decoration: none;
-  cursor: pointer;
+.spotify-frame iframe {
+  display: block;
+  width: 100%;
+  height: 152px;
+  border: 0;
 }
-.vinyl-listen:hover { text-decoration: underline; }
 
 .crate {
   display: flex;
   justify-content: center;
   gap: 12px;
-  margin-top: 14px;
-  padding-top: 16px;
-  border-top: 1px dashed var(--line);
+  margin-top: 16px;
 }
 .crate-disc {
-  width: 46px;
-  height: 46px;
-  border-radius: 50%;
-  border: 2px solid transparent;
+  width: 48px;
+  height: 48px;
+  border-radius: 4px;
+  border: 0;
   padding: 0;
   cursor: pointer;
-  background:
-    radial-gradient(circle, var(--card) 0 7%, var(--label-bg) 8% 36%, transparent 37%),
-    repeating-radial-gradient(circle, #16130f 0 2px, #26211a 3px, #16130f 4px);
+  background: var(--paper-deep) center / cover no-repeat;
   box-shadow: 0 2px 6px -2px rgba(20, 18, 16, 0.5);
-  opacity: 0.6;
+  opacity: 0.55;
   transition: opacity 0.2s ease, box-shadow 0.2s ease;
 }
 .crate-disc:hover { opacity: 1; }
@@ -539,6 +531,7 @@ a:focus-visible, button:focus-visible {
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   .vinyl { animation: none; }
+  .record-slot, .record-sleeve img { transition: none; }
   .reveal { opacity: 1; transform: none; transition: none; }
 }
 
