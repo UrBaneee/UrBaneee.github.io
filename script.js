@@ -1,4 +1,4 @@
-// Scroll-reveal for bento cards
+// Scroll-reveal for cards
 const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 const cards = document.querySelectorAll(".reveal");
 
@@ -126,7 +126,7 @@ if (screening && typeof screening.showModal === "function") {
   const media = document.getElementById("screening-media");
   const caption = document.getElementById("screening-caption");
 
-  document.querySelectorAll(".piece-video").forEach((btn) => {
+  document.querySelectorAll("[data-video]").forEach((btn) => {
     btn.addEventListener("click", () => {
       const frame = document.createElement("iframe");
       frame.src = `https://www.youtube-nocookie.com/embed/${btn.dataset.video}?autoplay=1&rel=0`;
@@ -154,23 +154,115 @@ if (screening && typeof screening.showModal === "function") {
   screening.addEventListener("close", stop);
 } else {
   // very old browsers: fall back to opening the video on YouTube
-  document.querySelectorAll(".piece-video").forEach((btn) => {
+  document.querySelectorAll("[data-video]").forEach((btn) => {
     btn.addEventListener("click", () => window.open(`https://youtu.be/${btn.dataset.video}`, "_blank", "noopener"));
   });
 }
 
-// Project filter chips
-const projectGrid = document.getElementById("project-grid");
-if (projectGrid) {
-  const chips = document.querySelectorAll(".filter-chip");
-  chips.forEach((chip) => {
-    chip.addEventListener("click", () => {
-      const f = chip.dataset.filter;
-      chips.forEach((c) => c.setAttribute("aria-pressed", String(c === chip)));
-      projectGrid.classList.toggle("is-filtered", f !== "all");
-      projectGrid.querySelectorAll(".piece").forEach((el) => {
-        el.hidden = f !== "all" && el.dataset.cat !== f;
-      });
+const root = document.documentElement;
+const seeOnce = (els, cls, opts) => {
+  if (prefersReducedMotion || !("IntersectionObserver" in window)) {
+    els.forEach((el) => el.classList.add(cls));
+    return;
+  }
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add(cls);
+        io.unobserve(entry.target);
+      }
     });
+  }, opts);
+  els.forEach((el) => io.observe(el));
+};
+
+// Project covers are "drawn" in as they scroll into view
+seeOnce(document.querySelectorAll(".work-cover"), "is-drawn", { threshold: 0.35 });
+
+// Five-Pavilion Bridge: each line is drawn in turn
+const bridge = document.querySelector(".bridge-art");
+if (bridge) {
+  bridge.querySelectorAll("path").forEach((p, i) => p.style.setProperty("--i", i));
+  if (prefersReducedMotion) bridge.classList.add("is-drawn");
+  else setTimeout(() => seeOnce([bridge], "is-drawn", { threshold: 0.3 }), root.classList.contains("intro-play") ? 900 : 200);
+}
+
+// Opening: the name is written, then the story appears line by line
+if (root.classList.contains("intro-play")) {
+  const steps = [...document.querySelectorAll(".hello .story-line, .hello .social-row")];
+  const skip = document.getElementById("skip-intro");
+  const timers = [];
+  let done = false;
+
+  const finish = () => {
+    if (done) return;
+    done = true;
+    timers.forEach(clearTimeout);
+    steps.forEach((el) => el.classList.add("is-shown"));
+    root.classList.add("intro-done");
+    skip.hidden = true;
+    window.removeEventListener("scroll", onScroll);
+    try { sessionStorage.setItem("introSeen", "1"); } catch (e) {}
+  };
+  const onScroll = () => { if (window.scrollY > 120) finish(); };
+
+  let t = 1300;
+  steps.forEach((el, i) => {
+    timers.push(setTimeout(() => el.classList.add("is-shown"), t));
+    t += i === 0 ? 600 : 850;
+  });
+  timers.push(setTimeout(finish, t));
+
+  skip.hidden = false;
+  skip.addEventListener("click", finish);
+  window.addEventListener("scroll", onScroll, { passive: true });
+}
+
+// Local time in Yangzhou
+const yzTime = document.getElementById("yz-time");
+if (yzTime) {
+  const fmt = new Intl.DateTimeFormat("en-GB", { timeZone: "Asia/Shanghai", hour: "2-digit", minute: "2-digit" });
+  const tick = () => { yzTime.textContent = `It's ${fmt.format(new Date())} in Yangzhou right now`; };
+  tick();
+  setInterval(tick, 20000);
+}
+
+// Film frame counter: shows the current section and opens a section menu
+const fcToggle = document.getElementById("fc-toggle");
+if (fcToggle) {
+  const menu = document.getElementById("fc-menu");
+  const num = document.getElementById("fc-num");
+  const label = document.getElementById("fc-label");
+  const frames = [...document.querySelectorAll("[data-frame]")];
+  const links = [...menu.querySelectorAll("a")];
+
+  const setFrame = (el) => {
+    num.textContent = el.dataset.frame;
+    label.textContent = el.dataset.frameLabel;
+    links.forEach((a) => a.setAttribute("aria-current", String(a.getAttribute("href") === `#${el.id}`)));
+  };
+  setFrame(frames[0]);
+
+  if ("IntersectionObserver" in window) {
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => { if (entry.isIntersecting) setFrame(entry.target); });
+    }, { rootMargin: "-45% 0px -50% 0px" });
+    frames.forEach((f) => io.observe(f));
+  }
+
+  const setOpen = (open) => {
+    menu.hidden = !open;
+    fcToggle.setAttribute("aria-expanded", String(open));
+  };
+  fcToggle.addEventListener("click", () => setOpen(menu.hidden));
+  links.forEach((a) => a.addEventListener("click", () => setOpen(false)));
+  document.addEventListener("click", (e) => {
+    if (!menu.hidden && !e.target.closest(".frame-counter")) setOpen(false);
+  });
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && !menu.hidden) {
+      setOpen(false);
+      fcToggle.focus();
+    }
   });
 }
