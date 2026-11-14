@@ -100,17 +100,21 @@
         <h2 id="vinyl-title">Now Spinning</h2>
       </div>
       <div class="vinyl-wrap">
-        <div class="vinyl" aria-hidden="true">
+        <div class="vinyl" id="vinyl" aria-hidden="true">
           <div class="vinyl-sheen"></div>
           <div class="vinyl-label">
-            <span>SY·33⅓ RPM</span>
+            <span id="vinyl-label-text">SAKAMOTO</span>
           </div>
           <div class="vinyl-hole"></div>
         </div>
         <div class="tonearm" aria-hidden="true"></div>
       </div>
-      <!-- TODO: put what you're actually into right now -->
-      <p class="vinyl-caption">Currently on rotation: building small things fast, and letting the process play out loud.</p>
+      <div class="vinyl-info" aria-live="polite">
+        <p class="vinyl-album" id="vinyl-album">Music For Film</p>
+        <p class="vinyl-artist" id="vinyl-artist">Ryuichi Sakamoto · 2016</p>
+        <a class="vinyl-listen" id="vinyl-listen" href="https://open.spotify.com/album/202ZOGO9zNndH8oxrBrm35" target="_blank" rel="noopener">Listen on Spotify →</a>
+      </div>
+      <div class="crate" id="crate" role="group" aria-label="Pick a record from the crate"></div>
     </section>
 
     <!-- Quote card -->

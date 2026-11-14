@@ -263,16 +263,20 @@ a:focus-visible, button:focus-visible {
   margin: auto;
   width: 37%; height: 37%;
   border-radius: 50%;
-  background: radial-gradient(circle, #d9541f 0%, var(--accent) 70%);
+  background: var(--label-bg, var(--accent));
+  box-shadow: inset 0 0 0 3px rgba(20, 18, 16, 0.12);
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
+  transition: background 0.25s ease;
 }
 .vinyl-label span {
-  font-size: 8.5px;
+  margin-top: 17%;
+  font-size: 8px;
   font-weight: 600;
-  letter-spacing: 0.14em;
-  color: #fff3e4;
+  letter-spacing: 0.12em;
+  white-space: nowrap;
+  color: var(--label-fg, #fff3e4);
 }
 .vinyl-hole {
   position: absolute; inset: 0;
@@ -313,12 +317,57 @@ a:focus-visible, button:focus-visible {
 
 @keyframes spin { to { transform: rotate(360deg); } }
 
-.vinyl-caption {
-  font-size: 14.5px;
-  color: var(--muted);
-  text-align: center;
-  max-width: 34ch;
-  margin: 0 auto;
+.vinyl-wrap .vinyl,
+.vinyl-wrap .tonearm { transition: opacity 0.25s ease, transform 0.25s ease; }
+.vinyl-wrap.is-swapping .vinyl { opacity: 0; }
+.vinyl-wrap.is-swapping .tonearm { transform: rotate(-40deg); }
+
+.vinyl-info { text-align: center; }
+.vinyl-album {
+  font-family: "Fraunces", Georgia, serif;
+  font-size: 19px;
+  font-weight: 600;
+  line-height: 1.25;
+}
+.vinyl-artist { font-size: 14px; color: var(--muted); margin-top: 2px; }
+.vinyl-listen {
+  display: inline-block;
+  margin-top: 8px;
+  padding: 6px 4px;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--accent-ink);
+  text-decoration: none;
+  cursor: pointer;
+}
+.vinyl-listen:hover { text-decoration: underline; }
+
+.crate {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 14px;
+  padding-top: 16px;
+  border-top: 1px dashed var(--line);
+}
+.crate-disc {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  padding: 0;
+  cursor: pointer;
+  background:
+    radial-gradient(circle, var(--card) 0 7%, var(--label-bg) 8% 36%, transparent 37%),
+    repeating-radial-gradient(circle, #16130f 0 2px, #26211a 3px, #16130f 4px);
+  box-shadow: 0 2px 6px -2px rgba(20, 18, 16, 0.5);
+  opacity: 0.6;
+  transition: opacity 0.2s ease, box-shadow 0.2s ease;
+}
+.crate-disc:hover { opacity: 1; }
+.crate-disc.is-active {
+  opacity: 1;
+  box-shadow: 0 0 0 2px var(--card), 0 0 0 4px var(--accent);
 }
 
 /* ---- Quote ---- */
