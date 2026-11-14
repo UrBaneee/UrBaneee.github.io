@@ -541,6 +541,11 @@ html.js:not(.rm) .work-cover:not(.is-drawn) .cover-art { clip-path: inset(0 100%
   stroke-linejoin: round;
 }
 .pin.is-current .pin-label { fill: var(--ink); font-weight: 500; }
+/* last step: San Diego and the Bay Area, where Skye is looking for work */
+.pin.is-option { opacity: 1; }
+.pin.is-option .pin-dot { fill: var(--card); stroke: var(--accent); stroke-width: calc(var(--k) * 1.8px); }
+.pin.is-option .pin-ring { opacity: 1; stroke-dasharray: calc(var(--k) * 2px) calc(var(--k) * 2px); }
+.pin.is-option .pin-label { fill: var(--accent-ink); font-weight: 500; }
 #journey-svg.is-overview .pin-quiet .pin-label { display: none; }
 .map-plane { fill: var(--ink); opacity: 0; transition: opacity 0.25s ease; }
 .map-plane.is-flying { opacity: 1; }

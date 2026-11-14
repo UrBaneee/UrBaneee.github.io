@@ -279,15 +279,15 @@ if (jSvg) {
   const P = {
     yangzhou: [421.4, 125.6], bangkok: [364.4, 192.2], nanjing: [419.7, 126.7],
     melbourne: [487.4, 379.3], singapore: [371.7, 238.3], london: [160.3, 65.1],
-    shanghai: [426.3, 129.6], northcarolina: [831, 114.7], rhodeisland: [837.3, 94.8],
-    sandiego: [738.1, 124.5],
+    shanghai: [426.3, 129.6], northcarolina: [826.8, 113], rhodeisland: [837.3, 94.8],
+    sandiego: [738.1, 124.5], bayarea: [719.3, 108.1],
   };
   // label placement around each pin, so close neighbours don't overlap
   const PLACES = {
     yangzhou: ["Yangzhou", "n"], bangkok: ["Bangkok", "w"], nanjing: ["Nanjing", "w"],
     melbourne: ["Melbourne", "e"], singapore: ["Singapore", "w"], london: ["London", "n"],
     shanghai: ["Shanghai", "e"], northcarolina: ["North Carolina", "s"], rhodeisland: ["Rhode Island", "n"],
-    sandiego: ["San Diego", "w"],
+    sandiego: ["San Diego", "w"], bayarea: ["Bay Area", "n"],
   };
   const STEPS = [
     { place: "yangzhou", legs: [] },
@@ -382,7 +382,7 @@ if (jSvg) {
   const frame = (i) => {
     const st = STEPS[i];
     let pts = [];
-    if (st.overview) LEGS.forEach((L) => pts.push(L.a, L.b, pointAt(L, 0.5).pt));
+    if (st.overview) { LEGS.forEach((L) => pts.push(L.a, L.b, pointAt(L, 0.5).pt)); pts.push(P.bayarea); }
     else if (!st.legs.length) pts = [P[st.place]];
     else LEGS.filter((L) => L.step === i).forEach((L) => pts.push(L.a, L.b, pointAt(L, 0.5).pt));
     const xs = pts.map((p) => p[0]), ys = pts.map((p) => p[1]);
@@ -411,6 +411,8 @@ if (jSvg) {
     Object.entries(PINS).forEach(([key, pin]) => {
       pin.g.classList.toggle("is-visited", visited.has(key));
       pin.g.classList.toggle("is-current", key === currentKey);
+      // the last step marks where Skye is looking for work: San Diego, or the Bay Area
+      pin.g.classList.toggle("is-option", !!STEPS[current]?.overview && (key === "bayarea" || key === "sandiego"));
     });
   };
 
@@ -429,6 +431,7 @@ if (jSvg) {
       else setLeg(L, forward && animate ? 0 : 1, "current");
     });
 
+    current = i;
     const visited = new Set(["yangzhou"]);
     STEPS.slice(0, i + 1).forEach((s, si) => {
       if (si < i || !(forward && animate)) LEGS.filter((L) => L.step === si).forEach((L) => { visited.add(L.from); visited.add(L.to); });
@@ -439,8 +442,7 @@ if (jSvg) {
 
     stepEls.forEach((el, j) => el.classList.toggle("is-active", j === i));
     hudStep.textContent = `${String(i + 1).padStart(2, "0")} / ${String(STEPS.length).padStart(2, "0")}`;
-    hudPlace.textContent = st.overview ? "The whole route" : PLACES[st.place][0];
-    current = i;
+    hudPlace.textContent = st.overview ? "Next: San Diego or Bay Area" : PLACES[st.place][0];
     jSvg.classList.toggle("is-overview", !!st.overview);
 
     const target = frame(i);
