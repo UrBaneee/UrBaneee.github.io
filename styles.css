@@ -153,11 +153,12 @@ a:focus-visible, button:focus-visible {
   margin: 0 auto;
   padding: clamp(36px, 6vw, 64px) 24px 40px;
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 22px;
 }
 
 .card {
+  min-width: 0;
   background: var(--card);
   border: 1px solid var(--line);
   border-radius: var(--radius);
@@ -218,60 +219,6 @@ a:focus-visible, button:focus-visible {
   border: 2px solid #2c2822;
 }
 .frame-media iframe { width: 100%; height: 100%; border: 0; display: block; }
-
-/* demo video thumbnail inside a project card */
-.piece-video {
-  display: block;
-  width: 100%;
-  margin: 0 0 14px;
-  padding: 2px 8px 0;
-  border: 0;
-  border-radius: 8px;
-  background: var(--black);
-  font: inherit;
-  text-align: left;
-  cursor: pointer;
-}
-.piece-video > span { display: block; }
-.piece-video-frame {
-  position: relative;
-  aspect-ratio: 16 / 9;
-  border-radius: 3px;
-  overflow: hidden;
-  background: #000;
-}
-.piece-video-frame img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-  opacity: 0.88;
-  transition: opacity 0.2s ease;
-}
-.piece-video:hover .piece-video-frame img { opacity: 1; }
-.piece-video-play {
-  position: absolute;
-  inset: 0;
-  margin: auto;
-  width: 46px;
-  height: 46px;
-  border-radius: 50%;
-  background: var(--accent);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.45);
-  transition: background 0.2s ease;
-}
-.piece-video:hover .piece-video-play { background: var(--accent-ink); }
-.piece-video-play svg { width: 22px; height: 22px; fill: #fff8f0; }
-.piece-video-caption {
-  font-size: 10.5px;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: #b0a58d;
-  padding: 6px 2px 7px;
-}
 
 /* screening room dialog */
 .screening {
@@ -470,74 +417,131 @@ a:focus-visible, button:focus-visible {
   color: var(--muted);
 }
 
-/* ---- Puzzle projects ---- */
+/* ---- Projects ---- */
 .projects-hint {
   font-size: 14.5px;
   color: var(--muted);
-  margin: -10px 0 20px;
+  margin: -10px 0 18px;
 }
 
-.puzzle-grid {
+.project-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 26px;
+}
+.filter-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 38px;
+  padding: 6px 14px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--card);
+  color: var(--ink);
+  font: inherit;
+  font-size: 13.5px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+.filter-chip:hover { border-color: var(--accent); }
+.filter-count {
+  font-size: 11.5px;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+.filter-chip[aria-pressed="true"] {
+  background: var(--black);
+  border-color: var(--black);
+  color: #f6f1e7;
+}
+.filter-chip[aria-pressed="true"] .filter-count { color: #b0a58d; }
+
+/* minmax(0, 1fr) keeps every column the same width no matter what is inside */
+.project-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 18px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-auto-flow: row dense;
+  gap: 26px 18px;
 }
 
-.puzzle-piece {
+.piece {
   position: relative;
+  min-width: 0;
   display: flex;
   flex-direction: column;
   padding: 22px 20px 18px;
   background: var(--paper-deep);
   border: 1px solid var(--line);
   border-radius: 14px;
-  text-decoration: none;
   color: var(--ink);
-  cursor: pointer;
-  overflow: visible;
+  text-decoration: none;
   transition: background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
 }
-/* puzzle knobs: one out the top, one socket notch on the right */
-.puzzle-piece::before {
+.piece[hidden] { display: none; }
+
+/* puzzle knob on top, socket notch on the right */
+.piece::before {
   content: "";
   position: absolute;
   top: -9px;
   left: 50%;
   transform: translateX(-50%);
-  width: 20px; height: 20px;
+  width: 18px; height: 18px;
   border-radius: 50%;
   background: inherit;
   border: 1px solid var(--line);
   border-bottom-color: transparent;
 }
-.puzzle-piece::after {
+.piece::after {
   content: "";
   position: absolute;
   right: -1px;
   top: 50%;
   transform: translateY(-50%);
-  width: 11px; height: 22px;
-  border-radius: 22px 0 0 22px;
+  width: 10px; height: 20px;
+  border-radius: 20px 0 0 20px;
   background: var(--card);
   border: 1px solid var(--line);
   border-right: none;
 }
-.puzzle-piece:hover {
+
+a.piece { cursor: pointer; }
+a.piece:hover,
+.piece-feature:hover {
   background: #fff;
   border-color: var(--accent);
-  box-shadow: 0 8px 20px -10px rgba(200, 69, 31, 0.35);
+  box-shadow: 0 10px 24px -14px rgba(200, 69, 31, 0.45);
 }
-.puzzle-piece:hover::before { background: #fff; border-color: var(--accent); border-bottom-color: transparent; }
+a.piece:hover::before,
+.piece-feature:hover::before { border-color: var(--accent); border-bottom-color: transparent; }
 
-.piece-index {
-  font-size: 11.5px;
+.piece-body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+.piece-kicker {
+  font-size: 11px;
   font-weight: 600;
-  letter-spacing: 0.14em;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
   color: var(--accent-ink);
 }
-.puzzle-piece h3 { font-size: 19px; margin: 8px 0 6px; }
-.puzzle-piece p { font-size: 14px; color: var(--muted); margin-bottom: 14px; }
+.piece h3 {
+  font-size: 20px;
+  margin: 6px 0 8px;
+  overflow-wrap: anywhere;
+}
+.piece-desc {
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--muted);
+  margin-bottom: 16px;
+}
 .piece-tags {
   list-style: none;
   display: flex;
@@ -554,15 +558,93 @@ a:focus-visible, button:focus-visible {
   background: var(--card);
   color: var(--muted);
 }
-.piece-cta { font-size: 13.5px; font-weight: 600; color: var(--accent-ink); text-decoration: none; }
-a.piece-cta { align-self: flex-start; padding: 4px 0; }
-a.piece-cta:hover { text-decoration: underline; }
-.puzzle-piece.has-video { cursor: default; }
-.puzzle-piece.has-video .piece-tags { margin-top: 0; }
-.puzzle-piece.has-video .piece-video { margin-top: auto; }
+.piece-link {
+  align-self: flex-start;
+  padding: 4px 0;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--accent-ink);
+  text-decoration: none;
+}
+a.piece-link:hover, a.piece:hover .piece-link { text-decoration: underline; }
 
-.piece-empty { opacity: 0.75; }
-.piece-empty h3 { color: var(--muted); }
+/* projects with a demo video: twice as wide, film still beside the text */
+.piece-feature {
+  grid-column: span 2;
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+  gap: 22px;
+  align-items: center;
+}
+
+.piece-video {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  padding: 0 10px;
+  border: 0;
+  border-radius: 8px;
+  background: var(--black);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  box-shadow: 0 8px 20px -10px rgba(20, 18, 16, 0.55);
+}
+.piece-video > span { display: block; }
+.piece-video-frame {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  border-radius: 3px;
+  overflow: hidden;
+  background: #000;
+}
+/* absolutely placed so the image can never widen its column */
+.piece-video-frame img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.85;
+  transition: opacity 0.2s ease;
+}
+.piece-video:hover .piece-video-frame img { opacity: 1; }
+.piece-video-play {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.45);
+  transition: background 0.2s ease;
+}
+.piece-video:hover .piece-video-play { background: var(--accent-ink); }
+.piece-video-play svg { width: 22px; height: 22px; fill: #fff8f0; }
+.piece-video-caption {
+  font-size: 10.5px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #b0a58d;
+  padding: 6px 2px 2px;
+}
+
+/* empty slot that finishes the last row */
+.piece-next {
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  min-height: 150px;
+  background: transparent;
+  border-style: dashed;
+}
+.piece-next::before { background: var(--card); border-style: dashed; border-bottom-color: transparent; }
+.piece-next .piece-desc { margin: 6px 0 0; }
+.project-grid.is-filtered .piece-next { display: none; }
 
 /* ---- X card ---- */
 .card-x { grid-column: 1 / -1; }
@@ -623,17 +705,18 @@ a.piece-cta:hover { text-decoration: underline; }
 }
 
 /* ============ Responsive ============ */
-@media (max-width: 860px) {
-  .puzzle-grid { grid-template-columns: repeat(2, 1fr); }
+@media (max-width: 900px) {
+  .project-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 
 @media (max-width: 720px) {
   .intro-inner { flex-direction: column-reverse; align-items: flex-start; }
   .portrait-frame { transform: rotate(2.5deg); width: 150px; }
-  .bento { grid-template-columns: 1fr; }
+  .bento { grid-template-columns: minmax(0, 1fr); }
 }
 
-@media (max-width: 520px) {
-  .puzzle-grid { grid-template-columns: 1fr; }
+@media (max-width: 600px) {
+  .project-grid { grid-template-columns: minmax(0, 1fr); gap: 24px; }
+  .piece-feature { grid-column: auto; grid-template-columns: minmax(0, 1fr); gap: 18px; }
   .card { padding: 20px; }
 }

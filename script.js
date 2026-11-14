@@ -158,3 +158,19 @@ if (screening && typeof screening.showModal === "function") {
     btn.addEventListener("click", () => window.open(`https://youtu.be/${btn.dataset.video}`, "_blank", "noopener"));
   });
 }
+
+// Project filter chips
+const projectGrid = document.getElementById("project-grid");
+if (projectGrid) {
+  const chips = document.querySelectorAll(".filter-chip");
+  chips.forEach((chip) => {
+    chip.addEventListener("click", () => {
+      const f = chip.dataset.filter;
+      chips.forEach((c) => c.setAttribute("aria-pressed", String(c === chip)));
+      projectGrid.classList.toggle("is-filtered", f !== "all");
+      projectGrid.querySelectorAll(".piece").forEach((el) => {
+        el.hidden = f !== "all" && el.dataset.cat !== f;
+      });
+    });
+  });
+}
