@@ -201,7 +201,7 @@ html.intro-done .signature-ink { animation: none; }
 .skip-intro[hidden] { display: none; }
 .skip-intro:hover { background: var(--black); }
 
-/* ---- portrait, printed on a square film frame ---- */
+/* ---- portrait: an Instax Square print ---- */
 .hello-aside {
   display: flex;
   flex-direction: column;
@@ -209,35 +209,30 @@ html.intro-done .signature-ink { animation: none; }
   padding-top: clamp(8px, 3vw, 36px);
 }
 .hello-photo { margin: 0; }
-.film-print {
+.instax {
   position: relative;
-  padding: 16px 16px 30px;
-  background: var(--black);
+  padding: 6.5% 6.5% 23%;
+  background: linear-gradient(160deg, #fdfcf8, #f6f3ec);
   border-radius: 3px;
-  transform: rotate(1.4deg);
-  box-shadow: 0 26px 50px -26px rgba(20, 18, 16, 0.7), 0 2px 6px rgba(20, 18, 16, 0.2);
+  transform: rotate(1.6deg);
+  box-shadow:
+    0 26px 48px -26px rgba(20, 18, 16, 0.6),
+    0 2px 6px rgba(20, 18, 16, 0.16),
+    inset 0 0 0 1px rgba(20, 18, 16, 0.05);
 }
-.film-print img {
+.instax img {
   display: block;
   width: 100%;
   height: auto;
   aspect-ratio: 1;
   object-fit: cover;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.08);
 }
-.edge {
-  position: absolute;
-  bottom: 9px;
-  font-family: var(--mono);
-  font-size: 9.5px;
-  letter-spacing: 0.2em;
-  color: #e0782f;
-}
-.edge-l { left: 16px; }
-.edge-r { right: 16px; }
 .hello-photo figcaption {
   margin-top: 16px;
   font-family: var(--mono);
   font-size: 12px;
+  line-height: 1.6;
   color: var(--muted);
 }
 
@@ -480,7 +475,128 @@ html.js:not(.rm) .work-cover:not(.is-drawn) .cover-art { clip-path: inset(0 100%
 .idx-desc { font-size: 14px; color: var(--muted); }
 .idx-arrow { color: var(--muted); }
 
-/* ============ 03 · Music & words ============ */
+/* ============ 03 · Journey ============ */
+.journey-intro {
+  max-width: 56ch;
+  margin: -14px 0 30px;
+  color: var(--muted);
+}
+.journey-body {
+  display: grid;
+  grid-template-columns: minmax(0, 2.1fr) minmax(0, 1fr);
+  gap: clamp(24px, 4vw, 48px);
+  align-items: start;
+}
+.journey-map {
+  position: sticky;
+  top: 12vh;
+  height: min(66vh, 560px);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: #f7f2e8;
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+#journey-svg {
+  --k: 1;
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.map-sphere { fill: #f7f2e8; stroke: none; }
+.map-grat { fill: none; stroke: #e6dccb; stroke-width: calc(var(--k) * 0.8px); stroke-dasharray: calc(var(--k) * 2px) calc(var(--k) * 4px); }
+.map-land { fill: var(--paper-deep); stroke: #a99b80; stroke-width: calc(var(--k) * 0.9px); stroke-linejoin: round; }
+.map-borders { fill: none; stroke: #cbbfa6; stroke-width: calc(var(--k) * 0.6px); stroke-dasharray: calc(var(--k) * 1.5px) calc(var(--k) * 2.5px); }
+.leg {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: calc(var(--k) * 2px);
+  stroke-linecap: round;
+}
+.leg.past, .leg.done {
+  stroke: var(--ink);
+  stroke-opacity: 0.45;
+  stroke-width: calc(var(--k) * 1.4px);
+  stroke-dasharray: calc(var(--k) * 4px) calc(var(--k) * 4px);
+}
+.leg.done { stroke: var(--accent-ink); stroke-opacity: 0.7; }
+.pin { opacity: 0; transition: opacity 0.4s ease; }
+.pin.is-visited { opacity: 1; }
+.pin-dot { fill: var(--ink); stroke: var(--card); stroke-width: calc(var(--k) * 1.5px); }
+.pin-ring { fill: none; stroke: var(--accent); stroke-width: calc(var(--k) * 1.5px); opacity: 0; }
+.pin.is-current .pin-dot { fill: var(--accent); }
+.pin.is-current .pin-ring { opacity: 1; animation: ping 1.8s ease-out infinite; transform-box: fill-box; transform-origin: center; }
+@keyframes ping {
+  0% { transform: scale(0.5); opacity: 0.9; }
+  100% { transform: scale(1.6); opacity: 0; }
+}
+.pin-label {
+  font-family: var(--mono);
+  font-size: calc(var(--k) * 11px);
+  letter-spacing: 0.06em;
+  fill: var(--muted);
+  paint-order: stroke;
+  stroke: #f7f2e8;
+  stroke-width: calc(var(--k) * 3px);
+  stroke-linejoin: round;
+}
+.pin.is-current .pin-label { fill: var(--ink); font-weight: 500; }
+#journey-svg.is-overview .pin-quiet .pin-label { display: none; }
+.map-plane { fill: var(--ink); opacity: 0; transition: opacity 0.25s ease; }
+.map-plane.is-flying { opacity: 1; }
+
+.map-hud {
+  position: absolute;
+  left: 14px;
+  bottom: 12px;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: rgba(20, 18, 16, 0.86);
+  color: #f6f1e7;
+  font-family: var(--mono);
+  font-size: 12px;
+}
+#hud-step { color: #ff8a4c; }
+
+.journey-steps { list-style: none; padding: 4vh 0 30vh; }
+.journey-step {
+  min-height: 62vh;
+  padding: 18px 0 0 22px;
+  border-left: 1px solid var(--line);
+  position: relative;
+  cursor: pointer;
+  opacity: 0.38;
+  transition: opacity 0.35s ease;
+}
+.journey-step:last-child { min-height: 40vh; }
+.journey-step::before {
+  content: "";
+  position: absolute;
+  left: -5px;
+  top: 25px;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--paper);
+  border: 1.5px solid var(--muted);
+  transition: background 0.3s ease, border-color 0.3s ease;
+}
+.journey-step.is-active { opacity: 1; }
+.journey-step.is-active::before { background: var(--accent); border-color: var(--accent); }
+.step-date {
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  color: var(--accent-ink);
+}
+.journey-step h3 { margin-top: 4px; font-size: clamp(26px, 3vw, 34px); font-weight: 400; }
+.step-where { font-family: var(--mono); font-size: 12px; color: var(--muted); margin-top: 2px; }
+.step-note { margin-top: 10px; color: var(--muted); max-width: 32ch; }
+
+/* ============ 04 · Music & words ============ */
 .bento {
   position: relative;
   z-index: 2;
@@ -750,7 +866,7 @@ html.js:not(.rm) .work-cover:not(.is-drawn) .cover-art { clip-path: inset(0 100%
   color: var(--muted);
 }
 
-/* ============ 04 · Contact ============ */
+/* ============ 05 · Contact ============ */
 .contact {
   position: relative;
   z-index: 2;
@@ -879,7 +995,7 @@ html:not(.js) .reveal { opacity: 1; transform: none; }
 /* ============ Reduced motion ============ */
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
-  .vinyl, .light-leak { animation: none; }
+  .vinyl, .light-leak, .pin.is-current .pin-ring { animation: none; }
   .record-slot, .record-sleeve img { transition: none; }
   .reveal { opacity: 1; transform: none; transition: none; }
 }
@@ -903,12 +1019,26 @@ html:not(.js) .reveal { opacity: 1; transform: none; }
   .postcard { border-top: 0; padding-top: 0; }
   .bento { grid-template-columns: minmax(0, 1fr); }
   .contact-inner { grid-template-columns: minmax(0, 1fr); }
+  .journey-body { grid-template-columns: minmax(0, 1fr); gap: 0; }
+  .journey-map {
+    top: 0;
+    z-index: 3;
+    height: 44vh;
+    margin: 0 -24px;
+    border-radius: 0;
+    border-left: 0;
+    border-right: 0;
+  }
+  .journey-steps { padding-top: 6vh; }
+  .journey-step { min-height: 52vh; }
+  /* keep the current stop's text just below the sticky map */
+  .step-card { position: sticky; top: calc(44vh + 18px); }
 }
 
 @media (max-width: 600px) {
   .work-grid { grid-template-columns: minmax(0, 1fr); gap: 44px; }
   .hello-aside { grid-template-columns: minmax(0, 1fr); }
-  .film-print { max-width: 340px; }
+  .instax { max-width: 340px; }
   .story-line { font-size: 17px; }
   .card { padding: 20px; }
   .work-index a { grid-template-columns: 48px minmax(0, 1fr) 18px; gap: 12px; }
