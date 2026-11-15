@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Darkroom · Skye Yin</title>
+  <meta name="description" content="Photographs by Skye Yin from the places she has lived, studied and travelled.">
+  <script>
+    (function () {
+      var d = document.documentElement;
+      d.classList.add("js");
+      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) d.classList.add("rm");
+    })();
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400&family=IBM+Plex+Mono:wght@400;500&family=Mrs+Saint+Delafield&family=Space+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='46' fill='%23141210'/><circle cx='50' cy='50' r='16' fill='%23c8451f'/><circle cx='50' cy='50' r='4' fill='%23f4eee3'/></svg>">
+</head>
+<body class="darkroom-page">
+
+  <div class="dr-layout">
+    <aside class="dr-side">
+      <a class="dr-name" href="./">Skye Yin</a>
+      <nav aria-label="Site">
+        <ul class="dr-nav">
+          <li><a href="./#work">Work</a></li>
+          <li><a href="./#journey">Journey</a></li>
+          <li><span class="dr-current" aria-current="page">Photographs</span>
+            <ul class="side-list dr-places" id="side-cities" aria-label="Places"></ul>
+          </li>
+          <li><a href="./#contact">Contact</a></li>
+        </ul>
+      </nav>
+      <a class="dr-back" href="./#darkroom">&larr; Back to the home page</a>
+    </aside>
+
+    <main class="dr-main">
+      <h1 class="dr-heading" id="dr-heading">Photographs</h1>
+      <div class="contact-sheet" id="contact-sheet"></div>
+    </main>
+  </div>
+
+  <!-- Photo viewer -->
+  <dialog class="gallery" id="gallery" aria-labelledby="gallery-caption">
+    <div class="gallery-stage">
+      <figure class="gallery-photo">
+        <img id="gallery-img" alt="">
+        <span class="date-stamp" id="gallery-date"></span>
+      </figure>
+      <button type="button" class="gallery-nav gallery-prev" id="gallery-prev" aria-label="Previous photo"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button>
+      <button type="button" class="gallery-nav gallery-next" id="gallery-next" aria-label="Next photo"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></button>
+    </div>
+    <div class="gallery-bar">
+      <p id="gallery-caption"></p>
+      <button type="button" class="screening-close" id="gallery-close">Close</button>
+    </div>
+    <div class="film-holes film-holes-sm" aria-hidden="true"></div>
+    <ol class="gallery-strip" id="gallery-strip"></ol>
+    <div class="film-holes film-holes-sm" aria-hidden="true"></div>
+  </dialog>
+
+  <script src="photos.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>

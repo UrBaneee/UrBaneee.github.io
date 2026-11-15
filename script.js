@@ -21,12 +21,17 @@ if (prefersReducedMotion || !("IntersectionObserver" in window)) {
 
 // Record crate: pick which album is on the turntable.
 // Covers are loaded from Spotify's image CDN; playback is Spotify's own embed.
+// Skye's vinyl collection, sorted into two piles
 const albums = [
-  { title: "Music For Film", artist: "Ryuichi Sakamoto", id: "202ZOGO9zNndH8oxrBrm35", cover: "7f93d0fcc5852192890f7918" },
-  { title: "Delta Dawn", artist: "Tanya Tucker", id: "3iyNh3uhudXLW5tNLapDZS", cover: "ba6c1e3f4d2454cec0c54361" },
-  { title: "A Symphonic Celebration", artist: "Joe Hisaishi", id: "561qUZZO6f2sILHUMlXmlM", cover: "8d4306c0878768bf296a39ed" },
-  { title: "我去2000年", artist: "Pu Shu 朴树", id: "5MXApzS7FdKbHoVRK6IDtw", cover: "2a2eb00100a85c104d0c5ae7" },
+  { title: "Music For Film", artist: "Ryuichi Sakamoto", id: "202ZOGO9zNndH8oxrBrm35", cover: "7f93d0fcc5852192890f7918", pile: 0 },
+  { title: "Interstellar", artist: "Hans Zimmer", id: "3B61kSKTxlY36cYgzvf3cP", cover: "81f04c407e0ec68e3dea6b2c", pile: 0 },
+  { title: "La La Land", artist: "Justin Hurwitz", id: "0nQJa9mRvan1HnkwbYuxAN", cover: "9387dbc2b28a455d6995d1ff", pile: 0 },
+  { title: "The Phantom of the Opera", artist: "Original London Cast", id: "08qngNLHQMtpXqBkeqN8Fr", cover: "68b085566bfa0165e44b945b", pile: 0, disc: ["#5e0d12", "#7d1a22"] },
+  { title: "我去2000年", artist: "朴树", id: "5MXApzS7FdKbHoVRK6IDtw", cover: "2a2eb00100a85c104d0c5ae7", pile: 1 },
+  { title: "陳婧霏", artist: "陈婧霏", id: "4qGQqbh3yCmD4a6PIuO5eu", cover: "1e3caff15fdf0ad843a6b4bd", pile: 1 },
+  { title: "浪潮上岸", artist: "橘子海 Orange Ocean", id: "1XmHCk8LzGRb1an4AsxKZk", cover: "46d69c5b65f8675119cf0779", pile: 1 },
 ];
+const PILES = ["Film & stage", "华语"];
 const coverUrl = (a, size) =>
   `https://i.scdn.co/image/ab67616d0000${size === "large" ? "b273" : "1e02"}${a.cover}`;
 
@@ -43,14 +48,25 @@ if (crate && record) {
 
   const setPlaying = (on) => record.classList.toggle("is-playing", on);
 
+  const nowPlaying = document.getElementById("now-playing");
+  const vinylEl = record.querySelector(".vinyl");
   const show = (i) => {
     const a = albums[i];
     coverEl.src = coverUrl(a, "large");
     coverEl.alt = `Album cover: ${a.title} by ${a.artist}`;
     labelEl.style.backgroundImage = `url("${coverUrl(a, "small")}")`;
-    crate.querySelectorAll("button").forEach((b, j) => {
-      b.classList.toggle("is-active", j === i);
-      b.setAttribute("aria-pressed", String(j === i));
+    // coloured vinyl (the Phantom pressing is red), otherwise black
+    vinylEl.style.setProperty("--disc", a.disc ? a.disc[0] : "#16130f");
+    vinylEl.style.setProperty("--groove", a.disc ? a.disc[1] : "#221e17");
+    if (nowPlaying) nowPlaying.innerHTML = `<span>On the turntable</span><strong></strong><em></em>`;
+    if (nowPlaying) {
+      nowPlaying.querySelector("strong").textContent = a.title;
+      nowPlaying.querySelector("em").textContent = a.artist;
+    }
+    crate.querySelectorAll("button").forEach((b) => {
+      const on = Number(b.dataset.i) === i;
+      b.classList.toggle("is-active", on);
+      b.setAttribute("aria-pressed", String(on));
     });
     if (i !== current) {
       setPlaying(false);
@@ -64,28 +80,45 @@ if (crate && record) {
     current = i;
   };
 
-  albums.forEach((a, i) => {
-    const b = document.createElement("button");
-    b.type = "button";
-    b.className = "crate-disc";
-    b.style.backgroundImage = `url("${coverUrl(a, "small")}")`;
-    b.setAttribute("aria-label", `${a.title} by ${a.artist}`);
-    b.title = `${a.title} · ${a.artist}`;
-    b.addEventListener("click", () => {
-      if (i === current) return;
-      clearTimeout(swapTimer);
-      if (prefersReducedMotion) {
-        show(i);
-        return;
-      }
-      // slide the record back into the sleeve, change sleeves, slide it out again
-      record.classList.add("is-swapping");
-      swapTimer = setTimeout(() => {
-        show(i);
-        record.classList.remove("is-swapping");
-      }, 420);
+  // two piles of sleeves, each tilted a little, like records laid out on the floor
+  PILES.forEach((pileName, p) => {
+    const group = document.createElement("div");
+    group.className = "pile";
+    const h = document.createElement("p");
+    h.className = "pile-title";
+    h.textContent = pileName;
+    const row = document.createElement("div");
+    row.className = "pile-row";
+    albums.forEach((a, i) => {
+      if (a.pile !== p) return;
+      const b = document.createElement("button");
+      b.type = "button";
+      b.className = "lp";
+      b.dataset.i = i;
+      b.style.setProperty("--r", `${[-3, 2, -1.5, 3, -2.5, 1.5, -1][i % 7]}deg`);
+      b.setAttribute("aria-label", `Play ${a.title} by ${a.artist}`);
+      b.innerHTML = '<span class="lp-sleeve"><img alt="" loading="lazy"><span class="lp-on">On the turntable</span></span><span class="lp-title"></span><span class="lp-artist"></span>';
+      b.querySelector("img").src = coverUrl(a, "small");
+      b.querySelector(".lp-title").textContent = a.title;
+      b.querySelector(".lp-artist").textContent = a.artist;
+      b.addEventListener("click", () => {
+        if (i === current) return;
+        clearTimeout(swapTimer);
+        if (prefersReducedMotion) {
+          show(i);
+          return;
+        }
+        // slide the record back into the sleeve, change sleeves, slide it out again
+        record.classList.add("is-swapping");
+        swapTimer = setTimeout(() => {
+          show(i);
+          record.classList.remove("is-swapping");
+        }, 420);
+      });
+      row.appendChild(b);
     });
-    crate.appendChild(b);
+    group.append(h, row);
+    crate.appendChild(group);
   });
 
   show(0);
@@ -271,6 +304,11 @@ if (fcToggle) {
   });
 }
 
+// Which photo stands for each city on the map (index into window.PHOTOS[city])
+const COVER = { nanjing: 2, bangkok: 1, melbourne: 2, singapore: 7, london: 3, shanghai: 4, northcarolina: 6, rhodeisland: 9, sandiego: 6 };
+// Keepers circled on each contact sheet (indexes into window.PHOTOS[city])
+const PICKS = { nanjing: [1, 8, 13, 16, 19, 21], bangkok: [2, 5, 6], melbourne: [1, 2, 12], singapore: [8, 9, 11], london: [0, 3, 4, 9], shanghai: [10, 12, 14], northcarolina: [7, 8, 15], rhodeisland: [8, 14, 16, 21], sandiego: [0, 4, 6] };
+
 // Journey map: a camera follows the route leg by leg as the steps scroll past
 const jSvg = document.getElementById("journey-svg");
 if (jSvg) {
@@ -284,10 +322,10 @@ if (jSvg) {
   };
   // label placement around each pin, so close neighbours don't overlap
   const PLACES = {
-    yangzhou: ["Yangzhou", "n"], bangkok: ["Bangkok", "w"], nanjing: ["Nanjing", "w"],
+    yangzhou: ["Yangzhou", "e"], bangkok: ["Bangkok", "w"], nanjing: ["Nanjing", "w"],
     melbourne: ["Melbourne", "e"], singapore: ["Singapore", "w"], london: ["London", "n"],
-    shanghai: ["Shanghai", "e"], northcarolina: ["North Carolina", "s"], rhodeisland: ["Rhode Island", "n"],
-    sandiego: ["San Diego", "w"], bayarea: ["Bay Area", "n"],
+    shanghai: ["Shanghai", "s"], northcarolina: ["North Carolina", "s"], rhodeisland: ["Rhode Island", "n"],
+    sandiego: ["San Diego", "w"], bayarea: ["San Francisco", "n"],
   };
   const STEPS = [
     { place: "yangzhou", legs: [] },
@@ -356,6 +394,29 @@ if (jSvg) {
     g.append(ring, dot, label);
     pinsG.appendChild(g);
     PINS[key] = { g, ring, dot, label, side };
+
+    const photos = (window.PHOTOS || {})[key];
+    if (photos && photos.length) {
+      const cover = photos[COVER[key] || 0] || photos[0];
+      g.classList.add("has-tile");
+      const tile = document.createElementNS(NS, "g");
+      tile.setAttribute("class", "photo-tile");
+      tile.setAttribute("aria-hidden", "true");
+      const stem = document.createElementNS(NS, "line");
+      stem.setAttribute("class", "tile-stem");
+      const frameRect = document.createElementNS(NS, "rect");
+      frameRect.setAttribute("class", "tile-frame");
+      const img = document.createElementNS(NS, "image");
+      img.setAttribute("href", cover.thumb);
+      img.setAttribute("preserveAspectRatio", "xMidYMid slice");
+      const cap = document.createElementNS(NS, "text");
+      cap.setAttribute("class", "tile-caption");
+      cap.textContent = `${name} · ${photos.length}`;
+      tile.append(stem, frameRect, img, cap);
+      tile.addEventListener("click", () => { window.location.href = `darkroom.html?place=${key}`; });
+      g.appendChild(tile);
+      PINS[key].tile = { stem, frameRect, img, cap };
+    }
   });
 
   let vb = null, k = 1;
@@ -368,6 +429,19 @@ if (jSvg) {
       const pos = { n: [x, y - o - 2 * k, "middle"], s: [x, y + o + 9 * k, "middle"], e: [x + o, y + 4 * k, "start"], w: [x - o, y + 4 * k, "end"] }[pin.side];
       pin.label.setAttribute("x", pos[0]); pin.label.setAttribute("y", pos[1]);
       pin.label.setAttribute("text-anchor", pos[2]);
+      if (pin.tile) {
+        // photo tile to the lower left of the pin, joined by a short stem
+        const S = 42 * k, b = 2.6 * k, x0 = x - 7 * k - S, y0 = y + 7 * k;
+        const t = pin.tile;
+        t.stem.setAttribute("x1", x); t.stem.setAttribute("y1", y);
+        t.stem.setAttribute("x2", x0 + S); t.stem.setAttribute("y2", y0);
+        t.frameRect.setAttribute("x", x0 - b); t.frameRect.setAttribute("y", y0 - b);
+        t.frameRect.setAttribute("width", S + 2 * b); t.frameRect.setAttribute("height", S + 2 * b);
+        t.frameRect.setAttribute("rx", 2 * k);
+        t.img.setAttribute("x", x0); t.img.setAttribute("y", y0);
+        t.img.setAttribute("width", S); t.img.setAttribute("height", S);
+        t.cap.setAttribute("x", x0 - b); t.cap.setAttribute("y", y0 + S + b + 11 * k);
+      }
     });
   };
   const setVB = (v) => {
@@ -411,7 +485,7 @@ if (jSvg) {
     Object.entries(PINS).forEach(([key, pin]) => {
       pin.g.classList.toggle("is-visited", visited.has(key));
       pin.g.classList.toggle("is-current", key === currentKey);
-      // the last step marks where Skye is looking for work: San Diego, or the Bay Area
+      // the last step marks where Skye is looking for work: San Diego or San Francisco
       pin.g.classList.toggle("is-option", !!STEPS[current]?.overview && (key === "bayarea" || key === "sandiego"));
     });
   };
@@ -442,7 +516,7 @@ if (jSvg) {
 
     stepEls.forEach((el, j) => el.classList.toggle("is-active", j === i));
     hudStep.textContent = `${String(i + 1).padStart(2, "0")} / ${String(STEPS.length).padStart(2, "0")}`;
-    hudPlace.textContent = st.overview ? "Next: San Diego or Bay Area" : PLACES[st.place][0];
+    hudPlace.textContent = st.overview ? "Next: San Diego / San Francisco" : PLACES[st.place][0];
     jSvg.classList.toggle("is-overview", !!st.overview);
 
     const target = frame(i);
@@ -499,4 +573,239 @@ if (jSvg) {
     clearTimeout(resizeTimer);
     resizeTimer = setTimeout(() => { gen++; setVB(frame(current)); }, 120);
   });
+}
+
+// Photo stacks in the Journey timeline, for each place that has photos
+document.querySelectorAll(".journey-step").forEach((li) => {
+  const key = li.dataset.overview ? null : li.dataset.place;
+  const photos = key && (window.PHOTOS || {})[key];
+  if (!photos || !photos.length) return;
+  const btn = document.createElement("a");
+  btn.href = `darkroom.html?place=${key}`;
+  btn.className = "photo-stack";
+  btn.setAttribute("aria-label", `See all ${photos.length} photos from ${li.querySelector("h3").textContent}`);
+  const thumbs = document.createElement("span");
+  thumbs.className = "stack-thumbs";
+  const c = COVER[key] || 0;
+  [c + 8, c + 4, c].forEach((n) => {
+    const p = photos[n % photos.length];
+    const im = document.createElement("img");
+    im.src = p.thumb;
+    im.alt = "";
+    im.loading = "lazy";
+    thumbs.appendChild(im);
+  });
+  const label = document.createElement("span");
+  label.className = "stack-label";
+  label.textContent = `${photos.length} photos`;
+  btn.append(thumbs, label);
+  btn.addEventListener("click", (e) => e.stopPropagation());
+  li.querySelector(".step-card").appendChild(btn);
+});
+
+// Photo viewer: big photo, film strip of thumbnails, arrow keys and swipe
+const gallery = document.getElementById("gallery");
+if (gallery && typeof gallery.showModal === "function") {
+  const img = document.getElementById("gallery-img");
+  const dateEl = document.getElementById("gallery-date");
+  const caption = document.getElementById("gallery-caption");
+  const strip = document.getElementById("gallery-strip");
+  const NAMES = { yangzhou: "Yangzhou", bangkok: "Bangkok", nanjing: "Nanjing", melbourne: "Melbourne", singapore: "Singapore", london: "London", shanghai: "Shanghai", northcarolina: "North Carolina", rhodeisland: "Rhode Island", sandiego: "San Diego" };
+  const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  let list = [], idx = 0, city = "";
+
+  const go = (i) => {
+    idx = (i + list.length) % list.length;
+    const p = list[idx];
+    img.src = p.src;
+    img.width = p.w;
+    img.height = p.h;
+    let when = "";
+    if (p.date) {
+      const [y, m, d] = p.date.split("-").map(Number);
+      dateEl.textContent = `'${String(y).slice(2)} ${m} ${d}`;
+      when = `, ${d} ${MONTHS[m - 1]} ${y}`;
+    } else dateEl.textContent = "";
+    img.alt = `Photo from ${NAMES[city] || city}${when}`;
+    caption.textContent = `${NAMES[city] || city} · ${String(idx + 1).padStart(2, "0")} / ${String(list.length).padStart(2, "0")}`;
+    strip.querySelectorAll("button").forEach((b, j) => {
+      b.classList.toggle("is-current", j === idx);
+      if (j === idx) b.scrollIntoView({ block: "nearest", inline: "center", behavior: prefersReducedMotion ? "auto" : "smooth" });
+    });
+    // warm the next photo
+    const next = new Image();
+    next.src = list[(idx + 1) % list.length].src;
+  };
+
+  window.openGallery = (key, start) => {
+    list = (window.PHOTOS || {})[key] || [];
+    if (!list.length) return;
+    city = key;
+    strip.replaceChildren(...list.map((p, j) => {
+      const li = document.createElement("li");
+      const b = document.createElement("button");
+      b.type = "button";
+      b.setAttribute("aria-label", `Photo ${j + 1}`);
+      const t = document.createElement("img");
+      t.src = p.thumb;
+      t.alt = "";
+      t.loading = "lazy";
+      b.appendChild(t);
+      b.addEventListener("click", () => go(j));
+      li.appendChild(b);
+      return li;
+    }));
+    gallery.showModal();
+    go(start || 0);
+  };
+
+  document.getElementById("gallery-prev").addEventListener("click", () => go(idx - 1));
+  document.getElementById("gallery-next").addEventListener("click", () => go(idx + 1));
+  document.getElementById("gallery-close").addEventListener("click", () => gallery.close());
+  gallery.addEventListener("click", (e) => { if (e.target === gallery) gallery.close(); });
+  gallery.addEventListener("keydown", (e) => {
+    if (e.key === "ArrowLeft") { e.preventDefault(); go(idx - 1); }
+    if (e.key === "ArrowRight") { e.preventDefault(); go(idx + 1); }
+  });
+  let x0 = null;
+  const stage = gallery.querySelector(".gallery-stage");
+  stage.addEventListener("pointerdown", (e) => { x0 = e.clientX; });
+  stage.addEventListener("pointerup", (e) => {
+    if (x0 === null) return;
+    const dx = e.clientX - x0;
+    x0 = null;
+    if (Math.abs(dx) > 40) go(idx + (dx < 0 ? 1 : -1));
+  });
+} else {
+  window.openGallery = () => {};
+}
+
+// Darkroom: a keepers strip on the home page, and the full photo page (darkroom.html)
+const ORDER = ["yangzhou", "bangkok", "nanjing", "melbourne", "singapore", "london", "shanghai", "northcarolina", "rhodeisland", "sandiego"];
+const PLACE_NAMES = { yangzhou: "Yangzhou", bangkok: "Bangkok", nanjing: "Nanjing", melbourne: "Melbourne", singapore: "Singapore", london: "London", shanghai: "Shanghai", northcarolina: "North Carolina", rhodeisland: "Rhode Island", sandiego: "San Diego" };
+const ALLP = window.PHOTOS || {};
+const photoCities = ORDER.filter((c) => (ALLP[c] || []).length);
+const photoTotal = photoCities.reduce((n, c) => n + ALLP[c].length, 0);
+
+// every photo for a place ("all" or a city), numbered across the whole archive
+const photoItems = (place) => {
+  const out = [];
+  let n = 0;
+  photoCities.forEach((c) => {
+    const picks = new Set(PICKS[c] || []);
+    ALLP[c].forEach((p, i) => {
+      n += 1;
+      if (place === "all" || place === c) out.push({ ...p, city: c, i, n, pick: picks.has(i) });
+    });
+  });
+  return out;
+};
+const photoLabel = (it) => `Open photo ${it.n} from ${PLACE_NAMES[it.city]}${it.pick ? ", a keeper" : ""}`;
+const thumbImg = (it) => {
+  const im = document.createElement("img");
+  im.src = it.thumb;
+  im.alt = "";
+  im.loading = "lazy";
+  im.width = it.w;
+  im.height = it.h;
+  return im;
+};
+// one strip of film frames, as on a contact sheet
+const filmStrip = (list) => {
+  const grid = document.createElement("ol");
+  grid.className = "sheet-grid";
+  list.forEach((it) => {
+    const li = document.createElement("li");
+    li.className = "sheet-frame";
+    const b = document.createElement("button");
+    b.type = "button";
+    b.setAttribute("aria-label", photoLabel(it));
+    const im = thumbImg(it);
+    if (it.h > it.w) im.classList.add("is-portrait");
+    b.appendChild(im);
+    b.addEventListener("click", () => window.openGallery(it.city, it.i));
+    const no = document.createElement("span");
+    no.className = "frame-no";
+    no.textContent = `▸ ${it.n}`;
+    li.append(b, no);
+    grid.appendChild(li);
+  });
+  return grid;
+};
+
+// home page: one strip of keepers and a link to the darkroom
+const teaser = document.getElementById("darkroom-teaser");
+if (teaser) {
+  if (!photoTotal) document.getElementById("darkroom").hidden = true;
+  else {
+    // one keeper from each city, in the order of the journey
+    const keepers = photoCities.map((c) => photoItems(c).find((it) => it.pick) || photoItems(c)[0]);
+    const paper = document.createElement("div");
+    paper.className = "sheet-paper";
+    paper.innerHTML = `<p class="sheet-title"><span>Keepers</span><span>One from each place</span></p>`;
+    const strip = filmStrip(keepers);
+    strip.style.setProperty("--n", keepers.length);
+    paper.appendChild(strip);
+    teaser.replaceChildren(paper);
+    document.getElementById("darkroom-count").textContent = `${photoTotal} photos`;
+  }
+}
+
+// darkroom.html: the full archive, by place
+const sheetEl = document.getElementById("contact-sheet");
+if (sheetEl && document.body.classList.contains("darkroom-page")) {
+  const cityList = document.getElementById("side-cities");
+  const heading = document.getElementById("dr-heading");
+  const params = new URLSearchParams(window.location.search);
+  let place = photoCities.includes(params.get("place")) ? params.get("place") : "all";
+
+  const years = (list) => {
+    const ys = list.map((p) => p.date && p.date.slice(0, 4)).filter(Boolean).sort();
+    if (!ys.length) return "";
+    return ys[0] === ys[ys.length - 1] ? ys[0] : `${ys[0]} – ${ys[ys.length - 1]}`;
+  };
+
+  // archive: photos run down one column, then the next, in columns that touch
+  const renderArchive = () => {
+    const wrap = document.createElement("div");
+    wrap.className = "archive-flow";
+    photoItems(place).forEach((it) => {
+      const fig = document.createElement("figure");
+      fig.className = "flow-item" + (it.pick ? " is-pick" : "");
+      const b = document.createElement("button");
+      b.type = "button";
+      b.setAttribute("aria-label", photoLabel(it));
+      b.appendChild(thumbImg(it));
+      b.addEventListener("click", () => window.openGallery(it.city, it.i));
+      const cap = document.createElement("figcaption");
+      cap.textContent = String(it.n).padStart(3, "0");
+      fig.append(b, cap);
+      wrap.appendChild(fig);
+    });
+    sheetEl.replaceChildren(wrap);
+  };
+
+  const render = () => {
+    const list = photoItems(place);
+    heading.innerHTML = `<span>${place === "all" ? "All places" : PLACE_NAMES[place]}</span><span>${list.length} photos</span><span>${years(list)}</span>`;
+    document.title = `${place === "all" ? "Photographs" : PLACE_NAMES[place]} · Darkroom · Skye Yin`;
+    renderArchive();
+    cityList.querySelectorAll("button").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.city === place)));
+    const q = new URLSearchParams();
+    if (place !== "all") q.set("place", place);
+    history.replaceState(null, "", q.toString() ? `?${q}` : window.location.pathname);
+  };
+
+  [["all", "All", photoTotal], ...photoCities.map((c) => [c, PLACE_NAMES[c], ALLP[c].length])].forEach(([key, name, count]) => {
+    const li = document.createElement("li");
+    const b = document.createElement("button");
+    b.type = "button";
+    b.dataset.city = key;
+    b.innerHTML = `${name} <span>${count}</span>`;
+    b.addEventListener("click", () => { place = key; render(); window.scrollTo({ top: 0, behavior: prefersReducedMotion ? "auto" : "smooth" }); });
+    li.appendChild(b);
+    cityList.appendChild(li);
+  });
+
+  render();
 }
